@@ -1,64 +1,155 @@
-*{
-    margin: 0;
-    padding: 0;
-    font-family: 'Poppins', sans-serif;
-    box-sizing: border-box;
-}
-.container{
-    width: 100%;
-    min-height: 100vh;
-    background: linear-gradient(135deg,#cf9aff, #95c0ff);
-    color: #fff;
-    padding-top: 4%;
-    padding-left: 10%;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-.container h1{
-    display: flex;
-    align-items: center;
-    font-size: 35px;
-    font-weight: 600;
+body {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #cf9aff 0%, #95c0ff 100%);
+  font-family: 'Nunito', sans-serif;
+  padding: 48px 10%;
 }
 
-.container h1 img{
-    width: 60px;
+.container h1 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 32px;
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 0 2px 8px rgba(120, 60, 200, 0.18);
+  margin-bottom: 4px;
 }
 
-.container button img{
-    width: 25px;
-    margin-right: 8px;
+.subtitle {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 14px;
+  margin-bottom: 28px;
+  padding-left: 2px;
 }
 
-.container button{
-    display: flex;
-    align-items: center;
-    background: linear-gradient(#9418fd, #571094);
-    color: #fff;
-    font-size: 15px;
-    outline: 0;
-    border: 0;
-    border-radius: 40px;
-    padding: 15px 25px;
-    margin: 30px 0 20px;
-    cursor: pointer;
+/* create button */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #9418fd, #571094);
+  color: #fff;
+  font-family: 'Nunito', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  border: none;
+  border-radius: 40px;
+  padding: 13px 26px;
+  cursor: pointer;
+  margin-bottom: 28px;
+  box-shadow: 0 4px 18px rgba(100, 20, 180, 0.28);
+  transition: transform 0.15s, box-shadow 0.15s;
 }
 
-.input-box{
-    position: relative;
-    width: 100%;
-    max-width: 500px;
-    min-width: 150px;
-    background: #fff;
-    color: #333;
-    padding: 20px;
-    margin: 20px 0;
-    outline: none;
-    border-radius: 5px;
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(100, 20, 180, 0.35);
 }
-.input-box img{
-    width: 25px;
-    position: absolute;
-    bottom: 15px;
-    right: 15px;
-    cursor: pointer;
+
+.btn:active {
+  transform: translateY(0);
+}
+
+/* notes grid */
+.notes-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 18px;
+}
+
+/* note card */
+.input-box {
+  position: relative;
+  background: #fff;
+  border-radius: 14px;
+  padding: 18px 18px 52px 18px;
+  min-height: 148px;
+  color: #333;
+  font-family: 'Nunito', sans-serif;
+  font-size: 15px;
+  line-height: 1.65;
+  outline: none;
+  box-shadow: 0 2px 12px rgba(120, 80, 200, 0.1);
+  transition: box-shadow 0.2s, transform 0.15s;
+  cursor: text;
+  word-break: break-word;
+  animation: pop 0.2s ease both;
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.input-box:hover {
+  box-shadow: 0 6px 22px rgba(120, 80, 200, 0.18);
+  transform: translateY(-2px);
+}
+
+.input-box:focus {
+  box-shadow: 0 6px 24px rgba(148, 50, 253, 0.22);
+  transform: translateY(-2px);
+}
+
+.input-box:empty::before {
+  content: 'Write something…';
+  color: #bbb;
+  pointer-events: none;
+}
+
+/* footer inside each card */
+.card-footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 10px 14px;
+  display: flex;
+  justify-content: flex-end;
+  border-top: 1px solid #f0f0f0;
+}
+
+.delete-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #ccc;
+  font-size: 18px;
+  line-height: 1;
+  padding: 2px 4px;
+  border-radius: 6px;
+  transition: color 0.15s, background 0.15s;
+}
+
+.delete-btn:hover {
+  color: #f06;
+  background: #fff0f4;
+}
+
+/* empty state */
+.empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 0;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 15px;
+}
+
+.empty .empty-icon {
+  font-size: 44px;
+  margin-bottom: 10px;
+  opacity: 0.5;
 }
