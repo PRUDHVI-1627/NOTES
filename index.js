@@ -1,77 +1,99 @@
 const container = document.getElementById("notesContainer");
 const createBtn = document.getElementById("createBtn");
-const KEY = "my_notes";
+const countLabel = document.getElementById("countLabel");
+const KEY = "my_notes_v2";
+const DOTS = ["#e05252", "#52b0e0", "#52e08a", "#e0a852", "#a852e0", "#e05295"];
+
+function updateCount() {
+  const n = container.querySelectorAll(".input-box").length;
+  countLabel.textContent = n === 0 ? "— 0 notes" : "— " + n + " note" + (n > 1 ? "s" : "");
+}
 
 function save() {
-  const data = [...container.querySelectorAll(".input-box")].map(box => {
+  const data = [];
+  container.querySelectorAll(".input-box").forEach(box => {
     const clone = box.cloneNode(true);
-    clone.querySelector(".card-footer")?.remove();
-    return clone.innerHTML.trim();
+    clone.querySelectorAll(".delete-btn, .card-dot").forEach(el => el.remove());
+    data.push({ html: clone.innerHTML.trim(), color: box.dataset.color });
   });
   localStorage.setItem(KEY, JSON.stringify(data));
+  updateCount();
   renderEmpty();
 }
 
 function renderEmpty() {
-  container.querySelector(".empty")?.remove();
-  if (!container.querySelector(".input-box")) {
-    container.innerHTML = `
-      <div class="empty">
-        <div class="empty-icon">🗒️</div>
-        No notes yet — hit Create Note!
-      </div>`;
+  const existing = container.querySelector(".empty-state");
+  const hasCards = container.querySelectorAll(".input-box").length > 0;
+  if (!hasCards && !existing) {
+    const el = document.createElement("div");
+    el.className = "empty-state";
+    el.innerHTML = '<span class="big">nothing here yet ✏️</span><span class="small">hit "+ new note" to start writing</span>';
+    container.appendChild(el);
+  } else if (hasCards && existing) {
+    existing.remove();
   }
 }
 
-function makeCard(html = "") {
-  const card = document.createElement("div");
-  card.className = "input-box";
-  card.contentEditable = "true";
-  if (html) card.innerHTML = html;
+function makeCard(html, colorDot, prepend) {
+  const box = document.createElement("div");
+  box.className = "input-box";
+  box.setAttribute("contenteditable", "true");
 
-  const footer = document.createElement("div");
-  footer.className = "card-footer";
-  footer.contentEditable = "false";
+  const idx = container.querySelectorAll(".input-box").length;
+  const color = colorDot || DOTS[idx % DOTS.length];
+  box.dataset.color = color;
 
+  // colored dot
+  const dot = document.createElement("span");
+  dot.className = "card-dot";
+  dot.setAttribute("contenteditable", "false");
+  dot.style.background = color;
+  box.appendChild(dot);
+
+  if (html) box.innerHTML += html;
+
+  // delete button
   const del = document.createElement("button");
   del.className = "delete-btn";
-  del.title = "Delete";
-  del.textContent = "🗑";
+  del.setAttribute("contenteditable", "false");
+  del.textContent = "delete";
   del.addEventListener("click", () => {
-    card.style.transition = "opacity 0.15s, transform 0.15s";
-    card.style.opacity = "0";
-    card.style.transform = "scale(0.93)";
-    setTimeout(() => { card.remove(); save(); }, 150);
+    box.style.transition = "opacity 0.15s, transform 0.15s";
+    box.style.opacity = "0";
+    box.style.transform += " scale(0.95)";
+    setTimeout(() => { box.remove(); save(); }, 150);
   });
+  box.appendChild(del);
 
-  footer.appendChild(del);
-  card.appendChild(footer);
-
-  card.addEventListener("keyup", save);
-  card.addEventListener("keydown", e => {
+  box.addEventListener("keyup", save);
+  box.addEventListener("keydown", e => {
     if (e.key === "Enter") {
       document.execCommand("insertLineBreak");
       e.preventDefault();
     }
   });
 
-  return card;
+  if (prepend && container.firstChild) container.insertBefore(box, container.firstChild);
+  else container.appendChild(box);
+
+  return box;
 }
 
 createBtn.addEventListener("click", () => {
-  container.querySelector(".empty")?.remove();
-  const card = makeCard();
-  container.prepend(card);
-  card.focus();
+  container.querySelector(".empty-state")?.remove();
+  const card = makeCard("", null, true);
+  updateCount();
   save();
+  requestAnimationFrame(() => card.focus());
 });
 
 // load saved notes on startup
 try {
-  const saved = JSON.parse(localStorage.getItem(KEY) || "[]");
-  saved.forEach(html => container.appendChild(makeCard(html)));
-} catch {
+  const raw = localStorage.getItem(KEY);
+  if (raw) JSON.parse(raw).forEach(({ html, color }) => makeCard(html, color, false));
+} catch (e) {
   localStorage.removeItem(KEY);
 }
 
+updateCount();
 renderEmpty();
